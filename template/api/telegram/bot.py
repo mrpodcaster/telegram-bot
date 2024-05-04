@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import redis.asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
+from aiogram_dialog import setup_dialogs
 from django.conf import settings
 
 from template.api.telegram.middleware import CheckUserMiddleware
@@ -16,16 +17,19 @@ logger = logging.getLogger(__name__)
 async def bot_lifespan():
     # All project imports should be done there
     from template.api.telegram.routers import router as main_router
+    from template.api.telegram.dialogs.main import main_window
+    from template.api.telegram.dialogs.set_level import set_level_window
 
     r = redis.asyncio.from_url(settings.FSM_STORAGE_URL)
     storage = RedisStorage(r, key_builder=DefaultKeyBuilder(with_destiny=True))
 
     bot = Bot(settings.TELEGRAM_TOKEN)
     dp = Dispatcher(storage=storage)
-    dp.include_routers(
-        main_router,
-    )
 
+    setup_dialogs(dp)
+    dp.include_routers(
+        main_router, main_window, set_level_window,
+    )
     dp.message.middleware(CheckUserMiddleware())
     dp.callback_query.middleware(CheckUserMiddleware())
     logger.warning("Initializing bot...")

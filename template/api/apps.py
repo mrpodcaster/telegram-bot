@@ -3,8 +3,8 @@ from django.conf import settings
 
 
 class ApiConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'template.api'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "template.api"
 
     def ready(self):
         if settings.BOT_MAIN:

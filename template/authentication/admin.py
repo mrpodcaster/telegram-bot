@@ -9,7 +9,10 @@ from template.authentication.models import TemplateUser
 class TemplateUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "telegram_id")}),
+        (
+            _("Personal info"),
+            {"fields": ("first_name", "last_name", "email", "telegram_id")},
+        ),
         (
             _("Permissions"),
             {
