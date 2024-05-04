@@ -8,7 +8,7 @@ from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from aiogram_dialog import setup_dialogs
 from django.conf import settings
 
-from template.api.telegram.middleware import CheckUserMiddleware
+from mrpodcaster.api.telegram.middleware import CheckUserMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def bot_lifespan():
     # All project imports should be done there
-    from template.api.telegram.routers import router as main_router
-    from template.api.telegram.dialogs.main import main_window
-    from template.api.telegram.dialogs.set_level import set_level_window
+    from mrpodcaster.api.telegram.routers import router as main_router
+    from mrpodcaster.api.telegram.dialogs.main import main_window
+    from mrpodcaster.api.telegram.dialogs.set_level import set_level_window
 
     r = redis.asyncio.from_url(settings.FSM_STORAGE_URL)
     storage = RedisStorage(r, key_builder=DefaultKeyBuilder(with_destiny=True))
@@ -28,7 +28,9 @@ async def bot_lifespan():
 
     setup_dialogs(dp)
     dp.include_routers(
-        main_router, main_window, set_level_window,
+        main_router,
+        main_window,
+        set_level_window,
     )
     dp.message.middleware(CheckUserMiddleware())
     dp.callback_query.middleware(CheckUserMiddleware())

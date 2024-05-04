@@ -45,7 +45,7 @@ services:
        - .env
      ports:
        - "8000:8000"
-     command: gunicorn -k uvicorn.workers.UvicornWorker template.asgi --bind 0.0.0.0:8000
+     command: gunicorn -k uvicorn.workers.UvicornWorker mrpodcaster.asgi --bind 0.0.0.0:8000
      depends_on:
       postgres:
         condition: service_healthy

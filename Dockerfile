@@ -18,7 +18,8 @@ RUN pip install --no-input pip-tools && \
     pip uninstall --no-input -y pip-tools && \
     pip install -r requirements.txt
 
-COPY ./template ./template/
+
+COPY mrpodcaster ./mrpodcaster
 RUN python ./manage.py collectstatic --noinput
 
 FROM staging as dev

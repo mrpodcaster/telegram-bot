@@ -1,5 +1,5 @@
 """
-ASGI config for template project.
+ASGI config for mrpodcaster project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,7 +11,7 @@ import os
 
 from django_asgi_lifespan.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "template.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mrpodcaster.settings")
 
 django_application = get_asgi_application()
 

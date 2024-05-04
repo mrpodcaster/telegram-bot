@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from template.authentication.models import TemplateUser
+from mrpodcaster.authentication.models import TelegramUser
 
 
 # Register your models here
-@admin.register(TemplateUser)
-class TemplateUserAdmin(UserAdmin):
+@admin.register(TelegramUser)
+class TelegramUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (

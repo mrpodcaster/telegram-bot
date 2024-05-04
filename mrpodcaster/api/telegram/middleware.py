@@ -4,8 +4,8 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import Update
 
-from template.api.telegram.utils import USER_NAME, IS_NEW_NAME
-from template.authentication.models import TemplateUser
+from mrpodcaster.api.telegram.utils import USER_NAME, IS_NEW_NAME
+from mrpodcaster.authentication.models import TelegramUser
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class CheckUserMiddleware(BaseMiddleware):
         event: Update,
         data: Dict[str, Any],
     ) -> Any:
-        client, is_new = await TemplateUser.objects.aget_or_create(
+        client, is_new = await TelegramUser.objects.aget_or_create(
             telegram_id=event.from_user.id,
             defaults={"username": event.from_user.username},
         )

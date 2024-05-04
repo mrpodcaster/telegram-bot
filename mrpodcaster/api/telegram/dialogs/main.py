@@ -6,8 +6,8 @@ from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.kbd import Group, SwitchTo, Start
 from aiogram_dialog.widgets.text import Const, Format
 
-from template.api.telegram.dialogs.set_level import SetLevelStateGroup
-from template.api.telegram.utils import USER_NAME
+from mrpodcaster.api.telegram.dialogs.set_level import SetLevelStateGroup
+from mrpodcaster.api.telegram.utils import USER_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,8 @@ class MainWindowGetterData(TypedDict):
 
 
 async def getter(
-        dialog_manager: DialogManager,
-        **_,
+    dialog_manager: DialogManager,
+    **_,
 ):
     return MainWindowGetterData(
         username=dialog_manager.middleware_data[USER_NAME].username,
@@ -36,10 +36,19 @@ main_window = Dialog(
         Format(
             "Hello, {username}!\n"
             "I am Mr. Podcastov. I have something interesting for you to listen to and share with others\n\n"
-            "Are you ready to start?"),
+            "Are you ready to start?"
+        ),
         Group(
-            SwitchTo(Const("How do you work Mr. Podcastov?"), id="help", state=MainStateGroup.help),
-            Start(Const("I want to choose my level"), id="choose_level", state=SetLevelStateGroup.main),
+            SwitchTo(
+                Const("How do you work Mr. Podcastov?"),
+                id="help",
+                state=MainStateGroup.help,
+            ),
+            Start(
+                Const("I want to choose my level"),
+                id="choose_level",
+                state=SetLevelStateGroup.main,
+            ),
             SwitchTo(Const("Authors"), id="authors", state=MainStateGroup.about),
             width=1,
         ),
@@ -47,7 +56,6 @@ main_window = Dialog(
         parse_mode="Markdown",
         getter=getter,
     ),
-
     Window(
         Format(
             "This is how Mr. Podcastov helps you {username}\n"
@@ -55,19 +63,16 @@ main_window = Dialog(
             "\t2) Choose your level and progress throughout the week\n"
             "\t3) At the end of the week Mr. Podcastov will match you with a random partner who listened to the same podcast as you and you can start a discussion!\n"
             "\t4) Monitor your progress\n"
-            "\t5) Mr. Podcastov will add new podcasts next week!\n"),
+            "\t5) Mr. Podcastov will add new podcasts next week!\n"
+        ),
         SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
         state=MainStateGroup.help,
         parse_mode="Markdown",
-        getter=getter
+        getter=getter,
     ),
-
     Window(
-        Format(
-            "*About the authors*"
-        ),
+        Format("*About the authors*"),
         SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
-        state=MainStateGroup.about
-    )
-
+        state=MainStateGroup.about,
+    ),
 )
