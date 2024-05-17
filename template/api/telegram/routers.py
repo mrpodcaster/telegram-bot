@@ -12,5 +12,5 @@ router = Router()
 
 @router.message(CommandStart())
 async def start_handler(msg: Message):
-    logger.info(f'Message: {msg}')
+    logger.info(f"Message: {msg}")
     await msg.answer("Привет! Это бот-шаблон :)")

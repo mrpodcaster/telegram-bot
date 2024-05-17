@@ -4,6 +4,7 @@ import threading
 from contextlib import asynccontextmanager
 import redis.asyncio
 from aiogram import Bot, Dispatcher
+from aiogram import types
 from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from django.conf import settings
 
@@ -29,6 +30,18 @@ async def bot_lifespan():
     dp.message.middleware(CheckUserMiddleware())
     dp.callback_query.middleware(CheckUserMiddleware())
     logger.warning("Initializing bot...")
+
+    @dp.message(lambda message: "hello" in message.text.lower())
+    async def handle_hello(message: types.Message):
+        user_firstname = message.from_user.first_name
+        await message.answer(f"Hello {user_firstname}!")
+
+    @dp.message(lambda message: "who are you" in message.text.lower())
+    async def handle_who_are_you(message: types.Message):
+        await message.answer(
+            "Hello there! I'm here to boost your English skills through podcasts. "
+            "Would you like to know how to listen to them most effectively?"
+        )
 
     async def start_bot():
         logger.warning("Starting polling...")
