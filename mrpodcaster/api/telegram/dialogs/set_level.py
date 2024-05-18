@@ -23,7 +23,7 @@ async def level_select_getter(dialog_manager: DialogManager, **_):
 
 
 async def set_level(
-    query: CallbackQuery, select: Select, dialog_manager: DialogManager, level: str
+    query: CallbackQuery, _: Select, dialog_manager: DialogManager, level: str
 ):
     await query.answer(f"Your level set to: {level}")
     user: TelegramUser = dialog_manager.middleware_data[USER_NAME]

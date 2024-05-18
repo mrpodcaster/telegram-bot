@@ -58,12 +58,12 @@ main_window = Dialog(
     ),
     Window(
         Format(
-            "This is how Mr. Podcastov helps you {username}\n"
-            "\t1) There are 3 levels of difficulty\n"
-            "\t2) Choose your level and progress throughout the week\n"
-            "\t3) At the end of the week Mr. Podcastov will match you with a random partner who listened to the same podcast as you and you can start a discussion!\n"
-            "\t4) Monitor your progress\n"
-            "\t5) Mr. Podcastov will add new podcasts next week!\n"
+            "This is how Mr. Podcastov helps you *{username}*\n"
+            "\t☑️ There are 3 levels of difficulty\n"
+            "\t☑️ Choose your level and progress throughout the week\n"
+            "\t☑️ At the end of the week Mr. Podcastov will match you with a random partner who listened to the same podcast as you and you can start a discussion!\n"
+            "\t☑️ Monitor your progress\n"
+            "\t☑️ Mr. Podcastov will add new podcasts next week!\n"
         ),
         SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
         state=MainStateGroup.help,
