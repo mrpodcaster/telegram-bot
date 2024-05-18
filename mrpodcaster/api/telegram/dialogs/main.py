@@ -6,6 +6,7 @@ from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.kbd import Group, SwitchTo, Start
 from aiogram_dialog.widgets.text import Const, Format
 
+from mrpodcaster.api.telegram.dialogs.podcast import PodcastStateGroup
 from mrpodcaster.api.telegram.dialogs.set_level import SetLevelStateGroup
 from mrpodcaster.api.telegram.utils import USER_NAME
 
@@ -39,13 +40,18 @@ main_window = Dialog(
             "Are you ready to start?"
         ),
         Group(
+            Start(
+                Const("Start learning!"),
+                id="podcasts",
+                state=PodcastStateGroup.main
+            ),
             SwitchTo(
                 Const("How do you work Mr. Podcastov?"),
                 id="help",
                 state=MainStateGroup.help,
             ),
             Start(
-                Const("I want to choose my level"),
+                Const("I want Pto choose my level"),
                 id="choose_level",
                 state=SetLevelStateGroup.main,
             ),
