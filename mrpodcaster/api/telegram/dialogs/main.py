@@ -1,4 +1,4 @@
-import logging
+# import logging
 from typing import TypedDict
 
 from aiogram.fsm.state import State, StatesGroup
@@ -8,6 +8,10 @@ from aiogram_dialog.widgets.text import Const, Format
 
 from mrpodcaster.api.telegram.dialogs.set_level import SetLevelStateGroup
 from mrpodcaster.api.telegram.utils import USER_NAME
+import logging
+from aiogram_dialog.widgets.kbd import Button
+from aiogram.types import CallbackQuery
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +20,19 @@ class MainStateGroup(StatesGroup):
     main = State()
     help = State()
     about = State()
+    podcasts = State()
+    selected_podcast = State()
+
+
+class PodcastsListStateGroup(StatesGroup):
+    listing = State()
 
 
 class MainWindowGetterData(TypedDict):
     username: str
+
+
+id_to_title_map = {}
 
 
 async def getter(
@@ -28,15 +41,100 @@ async def getter(
 ):
     return MainWindowGetterData(
         username=dialog_manager.middleware_data[USER_NAME].username,
+        level=dialog_manager.middleware_data[USER_NAME].level,
     )
 
 
+async def get_podcasts(
+    dialog_manager: DialogManager,
+    **_,
+):
+    # Тут можно сделать фильтрацию по подкастам в зависимости от уровня сложности
+    return {"podcasts": ["Why r u gae", "Who says I'm gae", "..."]}
+
+
+def sanitize_id(title: str) -> str:
+    """Convert a title to a valid ID by removing problematic characters."""
+    return title.translate(str.maketrans("", "", " '?,.!/()\"")).lower()
+
+
+async def on_podcast_click(
+    callback_query: CallbackQuery, button: Button, manager: DialogManager
+):
+    _, sanitized_podcast_id = callback_query.data.split("_", 2)[:]  
+    original_podcast_title = id_to_title_map.get(
+        sanitized_podcast_id, "Unknown Podcast"
+    )
+    manager.current_context().dialog_data["selected_podcast"] = original_podcast_title
+    await manager.switch_to(MainStateGroup.selected_podcast)
+
+
+def create_podcast_buttons(podcasts):
+    buttons = []
+    for podcast in podcasts:
+        sanitized_id = sanitize_id(podcast)
+        id_to_title_map[sanitized_id] = podcast  
+        buttons.append(
+            Button(
+                Const(podcast),
+                id=f"podcast_{sanitized_id}",  
+                on_click=on_podcast_click,
+            )
+        )
+    return buttons
+
+
+async def get_the_podcast(dialog_manager: DialogManager, **kwargs):
+    data = MainWindowGetterData(
+        username=dialog_manager.middleware_data[USER_NAME].username,
+        level=dialog_manager.middleware_data[USER_NAME].level,
+        podcast=dialog_manager.current_context().dialog_data.get(
+            "podcast", "No podcast selected"
+        ),
+    )
+    return data
+
+
+podcasts_window = Window(
+    Const("Podcasts for your level:"),
+    Group(
+        *create_podcast_buttons(["Why r u gae", "Who says I'm gae", "..."]),
+    ),
+    SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
+    state=MainStateGroup.podcasts,
+    getter=get_podcasts,
+    parse_mode="Markdown",
+)
+
+
+async def selected_podcast_getter(dialog_manager: DialogManager, **_):
+    return dialog_manager.current_context().dialog_data
+
+
+selected_podcast_window = Window(
+    Format("You selected podcast: {selected_podcast}"),
+    SwitchTo(Const("Back"), id="back", state=MainStateGroup.podcasts),
+    state=MainStateGroup.selected_podcast,
+    getter=selected_podcast_getter,
+    parse_mode="Markdown",
+)
+
 main_window = Dialog(
+    podcasts_window,
+    selected_podcast_window,
     Window(
         Format(
             "Hello, {username}!\n"
             "I am Mr. Podcastov. I have something interesting for you to listen to and share with others\n\n"
             "Are you ready to start?"
+        ),
+        Group(
+            SwitchTo(
+                Const("List Podcasts"),
+                id="list_podcasts",
+                state=MainStateGroup.podcasts,
+            ),
+            width=1,
         ),
         Group(
             SwitchTo(
