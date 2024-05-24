@@ -1,4 +1,3 @@
-# import logging
 from typing import TypedDict
 
 from aiogram.fsm.state import State, StatesGroup
@@ -6,7 +5,9 @@ from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.kbd import Group, SwitchTo, Start
 from aiogram_dialog.widgets.text import Const, Format
 
-from mrpodcaster.api.telegram.dialogs.set_level import SetLevelStateGroup
+from mrpodcaster.api.telegram.dialogs.set_level import (
+    SetLevelStateGroup,
+)
 from mrpodcaster.api.telegram.utils import USER_NAME
 import logging
 from aiogram_dialog.widgets.kbd import Button
@@ -33,6 +34,12 @@ class MainWindowGetterData(TypedDict):
 
 
 id_to_title_map = {}
+userLevels = {}
+podcasts_by_level = {
+    "easy": ["Why r u gae", "Other Podcast 1", "Another 1"],
+    "medium": ["Who says I'm gae", "Other Podcast 2", "Another 2"],
+    "challenging": ["...", "Other Podcast 3", "Another 3"],
+}
 
 
 async def getter(
@@ -41,16 +48,19 @@ async def getter(
 ):
     return MainWindowGetterData(
         username=dialog_manager.middleware_data[USER_NAME].username,
-        level=dialog_manager.middleware_data[USER_NAME].level,
     )
 
 
-async def get_podcasts(
-    dialog_manager: DialogManager,
-    **_,
-):
-    # Тут можно сделать фильтрацию по подкастам в зависимости от уровня сложности
-    return {"podcasts": ["Why r u gae", "Who says I'm gae", "..."]}
+async def get_podcasts(dialog_manager: DialogManager, **_):
+    user_level = (
+        dialog_manager.current_context().dialog_data.get("current_level", "easy"),
+    )
+    available_podcasts = podcasts_by_level.get(user_level, [])
+
+    # Create podcast buttons for the available podcasts
+    buttons = await create_podcast_buttons(available_podcasts)
+
+    return {"podcasts": available_podcasts, "buttons": buttons}
 
 
 def sanitize_id(title: str) -> str:
@@ -61,7 +71,7 @@ def sanitize_id(title: str) -> str:
 async def on_podcast_click(
     callback_query: CallbackQuery, button: Button, manager: DialogManager
 ):
-    _, sanitized_podcast_id = callback_query.data.split("_", 2)[:]  
+    _, sanitized_podcast_id = callback_query.data.split("_", 2)[:]
     original_podcast_title = id_to_title_map.get(
         sanitized_podcast_id, "Unknown Podcast"
     )
@@ -69,15 +79,31 @@ async def on_podcast_click(
     await manager.switch_to(MainStateGroup.selected_podcast)
 
 
-def create_podcast_buttons(podcasts):
+async def create_podcast_buttons(podcasts):
     buttons = []
     for podcast in podcasts:
         sanitized_id = sanitize_id(podcast)
-        id_to_title_map[sanitized_id] = podcast  
+        id_to_title_map[sanitized_id] = podcast
         buttons.append(
             Button(
                 Const(podcast),
-                id=f"podcast_{sanitized_id}",  
+                id=f"podcast_{sanitized_id}",
+                on_click=on_podcast_click,
+            )
+        )
+    return buttons
+
+
+# NOT ASYNC
+def make_podcast_buttons(podcasts):
+    buttons = []
+    for podcast in podcasts:
+        sanitized_id = sanitize_id(podcast)
+        id_to_title_map[sanitized_id] = podcast
+        buttons.append(
+            Button(
+                Const(podcast),
+                id=f"podcast_{sanitized_id}",
                 on_click=on_podcast_click,
             )
         )
@@ -87,7 +113,6 @@ def create_podcast_buttons(podcasts):
 async def get_the_podcast(dialog_manager: DialogManager, **kwargs):
     data = MainWindowGetterData(
         username=dialog_manager.middleware_data[USER_NAME].username,
-        level=dialog_manager.middleware_data[USER_NAME].level,
         podcast=dialog_manager.current_context().dialog_data.get(
             "podcast", "No podcast selected"
         ),
@@ -98,7 +123,10 @@ async def get_the_podcast(dialog_manager: DialogManager, **kwargs):
 podcasts_window = Window(
     Const("Podcasts for your level:"),
     Group(
-        *create_podcast_buttons(["Why r u gae", "Who says I'm gae", "..."]),
+        #! BUG IS HERE, NEED TO REPLACE THE HARDCODED LIST ON THE ONE FROM --- async get_podcasts()
+        *make_podcast_buttons(["Why r u gae", "Who says I'm gae", "..."]),
+        id="podcasts_group",
+        width=1,
     ),
     SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
     state=MainStateGroup.podcasts,

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Podcast, TelegramConversationView
+from .models import Podcast, ViewModel
 
 
 # Register your models here.
@@ -8,6 +8,6 @@ class PodcastAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(TelegramConversationView)
-class TelegramConversationViewAdmin(admin.ModelAdmin):
+@admin.register(ViewModel)
+class ViewModelAdmin(admin.ModelAdmin):
     pass
