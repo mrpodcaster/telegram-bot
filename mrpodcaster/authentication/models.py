@@ -13,4 +13,4 @@ class DifficultyLevel(models.TextChoices):
 
 class TelegramUser(AbstractUser):
     telegram_id = models.CharField(null=True, blank=True, max_length=255)
-    level = models.CharField()
+    linked_podcasts = models.ManyToManyField(to="api.Podcast")
