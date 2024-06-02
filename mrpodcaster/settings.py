@@ -28,8 +28,7 @@ SECRET_KEY = env.str("SECRET_KEY", default="django-insecure")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", ["mrpodcaster.born-in-july.ru"])
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["https://mrpodcaster.born-in-july.ru"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", ["*"])
 # Logging
 
 LOGGING = {
@@ -64,7 +63,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
