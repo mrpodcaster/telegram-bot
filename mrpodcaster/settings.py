@@ -28,8 +28,8 @@ SECRET_KEY = env.str("SECRET_KEY", default="django-insecure")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.str("ALLOWED_HOSTS", "localhost").split(",")
-
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", ["mrpodcaster.born-in-july.ru"])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["https://mrpodcaster.born-in-july.ru"])
 # Logging
 
 LOGGING = {
