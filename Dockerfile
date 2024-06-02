@@ -1,32 +1,27 @@
-FROM python:3.11-slim as staging
+FROM python:3.11-slim AS development
 
-ENV \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONFAULTHANDLER=1
+WORKDIR /app
 
-WORKDIR /
+ARG POETRY_HOME=/etc/poetry
+
+COPY poetry.lock pyproject.toml ./
+
+ENV PATH="${PATH}:${POETRY_HOME}/bin"
 
 RUN apt-get update && \
     export DEBIAN_FRONTEND=noninteractive && \
-    apt-get install -y tini && \
-    python3 -m venv venv
+    apt-get install -y libyaml-dev curl && \
+    curl -sSL https://install.python-poetry.org | POETRY_HOME=${POETRY_HOME} python - --version 1.4.0 && \
+    apt-get remove -y curl && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-cache && \
+    rm -rf ~/.cache ~/.config/pypoetry/auth.toml && \
+    poetry install --without dev --sync --no-cache
 
-COPY ./requirements.in ./manage.py ./
-RUN pip install --no-input pip-tools && \
-    pip-compile -o requirements.txt ./requirements.in && \
-    pip uninstall --no-input -y pip-tools && \
-    pip install -r requirements.txt
+COPY ./mrpodcaster ./mrpodcaster
+COPY manage.py .
 
-
-COPY mrpodcaster ./mrpodcaster
-RUN python ./manage.py collectstatic --noinput
-
-FROM staging as dev
-
-ENTRYPOINT ["tini", "--"]
-CMD ["python", "./manage.py", "runserver", "0.0.0.0:8000"]
-
-FROM staging as prod
-
-ENTRYPOINT ["tini", "--"]
+RUN python manage.py collectstatic --noinput

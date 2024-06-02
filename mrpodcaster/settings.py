@@ -15,9 +15,9 @@ import os
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-root = environ.Path(__file__) - 3  # get root of the project
+root = environ.Path(__file__) - 2  # get root of the project
 env = environ.Env()
-environ.Env.read_env()  # reading .env file
+environ.Env.read_env(env_file=os.path.join(root, ".env"))  # reading .env file
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

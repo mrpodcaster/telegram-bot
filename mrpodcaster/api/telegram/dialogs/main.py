@@ -1,37 +1,32 @@
 import logging
-from typing import TypedDict
 
 from aiogram.fsm.state import State, StatesGroup
 from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.kbd import Group, SwitchTo, Start
 from aiogram_dialog.widgets.text import Const, Format
 
-from mrpodcaster.api.telegram.dialogs.set_level import SetLevelStateGroup
+from mrpodcaster.api.telegram.dialogs.view_podcast import PodcastViewSG
 from mrpodcaster.api.telegram.utils import USER_NAME
 
 logger = logging.getLogger(__name__)
 
 
-class MainStateGroup(StatesGroup):
+class MainSG(StatesGroup):
     main = State()
     help = State()
     about = State()
-
-
-class MainWindowGetterData(TypedDict):
-    username: str
 
 
 async def getter(
     dialog_manager: DialogManager,
     **_,
 ):
-    return MainWindowGetterData(
-        username=dialog_manager.middleware_data[USER_NAME].username,
-    )
+    return {
+        "username": dialog_manager.middleware_data[USER_NAME].username,
+    }
 
 
-main_window = Dialog(
+dialog = Dialog(
     Window(
         Format(
             "Hello, {username}!\n"
@@ -42,17 +37,17 @@ main_window = Dialog(
             SwitchTo(
                 Const("How do you work Mr. Podcastov?"),
                 id="help",
-                state=MainStateGroup.help,
+                state=MainSG.help,
             ),
             Start(
-                Const("I want to choose my level"),
-                id="choose_level",
-                state=SetLevelStateGroup.main,
+                Const("Choose podcasts!"),
+                id="choose_podcasts" "",
+                state=PodcastViewSG.level,
             ),
-            SwitchTo(Const("Authors"), id="authors", state=MainStateGroup.about),
+            SwitchTo(Const("Authors"), id="authors", state=MainSG.about),
             width=1,
         ),
-        state=MainStateGroup.main,
+        state=MainSG.main,
         parse_mode="Markdown",
         getter=getter,
     ),
@@ -65,14 +60,14 @@ main_window = Dialog(
             "\t4) Monitor your progress\n"
             "\t5) Mr. Podcastov will add new podcasts next week!\n"
         ),
-        SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
-        state=MainStateGroup.help,
+        SwitchTo(Const("Back"), id="back", state=MainSG.main),
+        state=MainSG.help,
         parse_mode="Markdown",
         getter=getter,
     ),
     Window(
         Format("*About the authors*"),
-        SwitchTo(Const("Back"), id="back", state=MainStateGroup.main),
-        state=MainStateGroup.about,
+        SwitchTo(Const("Back"), id="back", state=MainSG.main),
+        state=MainSG.about,
     ),
 )

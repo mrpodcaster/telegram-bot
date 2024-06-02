@@ -7,7 +7,7 @@ from aiogram.filters import (
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
-from mrpodcaster.api.telegram.dialogs.main import MainStateGroup
+from mrpodcaster.api.telegram.dialogs.main import MainSG
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -15,4 +15,4 @@ router = Router()
 
 @router.message(CommandStart())
 async def start_handler(_: Message, dialog_manager: DialogManager) -> None:
-    await dialog_manager.start(MainStateGroup.main, mode=StartMode.RESET_STACK)
+    await dialog_manager.start(MainSG.main, mode=StartMode.RESET_STACK)

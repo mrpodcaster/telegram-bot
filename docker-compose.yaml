@@ -27,10 +27,7 @@ services:
       retries: 3
 
   migrations:
-     build:
-       context: .
-       dockerfile: Dockerfile
-       target: dev
+     build: .
      env_file: .env
      command: python ./manage.py migrate
      depends_on:
@@ -45,7 +42,7 @@ services:
        - .env
      ports:
        - "8000:8000"
-     command: gunicorn -k uvicorn.workers.UvicornWorker mrpodcaster.asgi --bind 0.0.0.0:8000
+     command: uvicorn mrpodcaster.asgi:application --host 0.0.0.0 --port 8000
      depends_on:
       postgres:
         condition: service_healthy

@@ -7,10 +7,10 @@ dev: format lint build
 	docker compose up --remove-orphans -d
 
 lint:
-	ruff check --fix ./template
+	poetry run ruff check --fix ./mrpodcaster
 
 format:
-	ruff format ./template
+	poetry run ruff format ./mrpodcaster
 
 makemigrations:
 	poetry run python ./manage.py makemigrations

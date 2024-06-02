@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 async def bot_lifespan():
     # All project imports should be done there
     from mrpodcaster.api.telegram.routers import router as main_router
-    from mrpodcaster.api.telegram.dialogs.main import main_window
-    from mrpodcaster.api.telegram.dialogs.set_level import set_level_window
+    from mrpodcaster.api.telegram.dialogs.main import dialog as main
+    from mrpodcaster.api.telegram.dialogs.view_podcast import dialog as view_podcast
 
     r = redis.asyncio.from_url(settings.FSM_STORAGE_URL)
     storage = RedisStorage(r, key_builder=DefaultKeyBuilder(with_destiny=True))
@@ -29,8 +29,8 @@ async def bot_lifespan():
     setup_dialogs(dp)
     dp.include_routers(
         main_router,
-        main_window,
-        set_level_window,
+        main,
+        view_podcast,
     )
     dp.message.middleware(CheckUserMiddleware())
     dp.callback_query.middleware(CheckUserMiddleware())
